@@ -1,0 +1,17 @@
+export function successResponse(res, message, data = null) {
+  res.status(200).json({
+    status: 200,
+    message,
+    error: false,
+    data,
+  });
+}
+
+export function errorResponse(res, statusCode, data) {
+  res.status(statusCode).json({
+    status: statusCode,
+    message,
+    error: true,
+    data: null,
+  });
+}
