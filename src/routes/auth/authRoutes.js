@@ -1,9 +1,18 @@
 import { Router } from "express";
-import { errorResponse } from "../helpers/serverResponse.js";
-import usermodel from "../model/usermodel.js";
-import { comparePassword, generateAccessToken } from "../helpers/helperFunction.js";
+import {
+  errorResponse,
+  successResponse,
+} from "../../helpers/serverResponse.js";
+import usermodel from "../../model/usermodel.js";
+import {
+  comparePassword,
+  generateAccessToken,
+} from "../../helpers/helperFunction.js";
 
 const authRouter = Router();
+
+authRouter.post("/signin", signinHandler);
+authRouter.post("/forgotpassword",forgetpasswordHandler);
 
 export default authRouter;
 
@@ -34,5 +43,17 @@ async function signinHandler(req, res) {
   } catch (error) {
     console.log("error", error);
     errorResponse(res, 500, "internal server error");
+  }
+}
+
+async function forgetpasswordHandler(req,res){
+  try {
+    const {email} = req.body;
+    if(!email){
+      return errorResponse(res,400,"some params are missing")
+    }
+  } catch (error) {
+    console.log("error",error);
+    errorResponse(res,500,"internal server error")
   }
 }

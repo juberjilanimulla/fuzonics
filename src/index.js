@@ -2,7 +2,7 @@ import express from "express";
 import config from "./config/config.js";
 import dbConnect from "./config/db.js";
 import cors from "cors";
-import authRouter from "./routes/authRoutes.js";
+import authRouter from "./routes/auth/authRoutes.js";
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import {
@@ -51,8 +51,6 @@ app.use((err, req, res, next) => {
 
 //routting
 app.use("/api/auth", authRouter);
-app.use("/api/admin");
-app.use("/api/user");
 
 //database connection
 dbConnect()
