@@ -140,3 +140,37 @@ export async function Admin() {
     }
   }
 }
+
+const otpRequestStore = {};
+
+//  Function to check rate limit for OTP requests
+export async function checkRateLimit(email) {
+  const windowMs = 15 * 60 * 1000; // 15 minutes in milliseconds
+  const maxRequests = 5;
+  const now = Date.now();
+
+  // Initialize request count for the mobile number if not exists
+  if (!otpRequestStore[email]) {
+    otpRequestStore[email] = [];
+  }
+
+  // Clean up old entries from the store
+  otpRequestStore[email] = otpRequestStore[email].filter((entry) => {
+    return entry.timestamp + windowMs > now;
+  });
+
+  // Check request count
+  if (otpRequestStore[email].length >= maxRequests) {
+    return false; // Rate limit exceeded
+  }
+
+  // Add current request to the store
+  otpRequestStore[email].push({ timestamp: now });
+
+  return true; // Within rate limit
+}
+
+export async function getnumber(id) {
+  // console.log(id);
+  return id;
+}

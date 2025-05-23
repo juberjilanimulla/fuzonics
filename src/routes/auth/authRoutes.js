@@ -5,6 +5,7 @@ import {
 } from "../../helpers/serverResponse.js";
 import usermodel from "../../model/usermodel.js";
 import {
+  checkRateLimit,
   comparePassword,
   generateAccessToken,
 } from "../../helpers/helperFunction.js";
@@ -12,7 +13,9 @@ import {
 const authRouter = Router();
 
 authRouter.post("/signin", signinHandler);
-authRouter.post("/forgotpassword",forgetpasswordHandler);
+authRouter.post("/forgotpassword", forgetpasswordHandler);
+authRouter.post("/resetpassword", resetpasswordHandler);
+authRouter.post("/signup", signupHandler);
 
 export default authRouter;
 
@@ -46,14 +49,45 @@ async function signinHandler(req, res) {
   }
 }
 
-async function forgetpasswordHandler(req,res){
+async function forgetpasswordHandler(req, res) {
   try {
-    const {email} = req.body;
-    if(!email){
-      return errorResponse(res,400,"some params are missing")
+    const { email } = req.body;
+    if (!email) {
+      return errorResponse(res, 400, "some params are missing");
     }
+    const user = await usermodel.findOne({ email });
+    if (!user) {
+      return errorResponse(res);
+    }
+    const isWithinRateLimit = await checkRateLimit(email);
+    if (!isWithinRateLimit) {
+      return errorResponse(
+        res,
+        429,
+        "Too many requests. Please try again after 15 minutes"
+      );
+    }
+    // usersotp.tokenotp = await sendEmailOTP(email, usersotp.firstname);
+    await usersotp.save();
+    successResponse(res, "OTP successfully sent");
   } catch (error) {
-    console.log("error",error);
-    errorResponse(res,500,"internal server error")
+    console.log("error", error);
+    errorResponse(res, 500, "internal server error");
+  }
+}
+
+async function resetpasswordHandler(req, res) {
+  try {
+  } catch (error) {
+    console.log("error", error);
+    errorResponse(res, 500, "internal server error");
+  }
+}
+
+async function signupHandler(req, res) {
+  try {
+  } catch (error) {
+    console.log("error", error);
+    errorResponse(res, 500, "internal server error");
   }
 }
