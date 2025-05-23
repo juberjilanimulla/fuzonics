@@ -1,14 +1,56 @@
-import { Schema, model } from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 
 const productSchema = new Schema(
   {
     name: String,
     description: String,
     qty: String,
+    productcode: String,
+    color: String,
+    images: [{ type: String }],
+    discountprice: {
+      type: String,
+    },
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "category",
+    },
+    subcategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "subcategory",
+    },
+    brand: String,
+    model: String,
+    specification: {
+      type: Map,
+      of: String,
+    },
+    stock: {
+      type: Number,
+      min: 0,
+      default: 0,
+    },
+    sku: {
+      type: String,
+      unique: true,
+    },
+    isActive: { type: Boolean, default: true },
+    isFeatured: { type: Boolean, default: false },
+    ratings: {
+      average: {
+        type: Number,
+        default: 0,
+        min: 0,
+        max: 5,
+      },
+      count: {
+        type: Number,
+        default: 0,
+      },
+    },
   },
   { timestamps: true, versionKey: false }
 );
-
 
 function currentLocalTimePlusOffset() {
   const now = new Date();
