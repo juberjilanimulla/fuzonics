@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 
 const subcategorySchema = new Schema(
   {
@@ -13,9 +13,11 @@ const subcategorySchema = new Schema(
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "category",
+      index:true
     },
     image: {
       type: String,
+      default: "",
     },
     isActive: {
       type: Boolean,

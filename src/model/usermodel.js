@@ -5,7 +5,11 @@ const userSchema = new Schema(
     firstname: String,
     lastname: String,
     email: String,
-    role: { type: String, default: "user" },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
     mobile: String,
     password: String,
     tokenotp: String,
@@ -23,7 +27,7 @@ function currentLocalTimePlusOffset() {
 userSchema.pre("save", function (next) {
   const currentTime = currentLocalTimePlusOffset();
   this.createdAt = currentTime;
-  this.udpatedAt = currentTime;
+  this.updatedAt = currentTime;
   next();
 });
 

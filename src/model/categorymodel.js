@@ -14,6 +14,7 @@ const categorySchema = new Schema(
     },
     image: {
       type: String,
+      default: "",
     },
     isActive: {
       type: Boolean,

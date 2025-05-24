@@ -7,7 +7,7 @@ export function successResponse(res, message, data = null) {
   });
 }
 
-export function errorResponse(res, statusCode, data) {
+export function errorResponse(res, statusCode, message) {
   res.status(statusCode).json({
     status: statusCode,
     message,

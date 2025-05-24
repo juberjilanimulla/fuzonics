@@ -4,8 +4,6 @@ import usermodel from "../model/usermodel.js";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcryptjs";
 
-
-
 const secretKey = crypto.randomBytes(48).toString("hex");
 // console.log("secretkey", secretKey);
 
@@ -26,7 +24,7 @@ export function generateAccessToken(id, email, role) {
   const public_token = jwt.sign(public_tokenPayload, secretKey, {
     expiresIn: "1d",
   });
-  return {encoded_token,public_token}
+  return { encoded_token, public_token };
 }
 
 //validate token
@@ -133,7 +131,6 @@ export async function Admin() {
         role: "admin",
         mobile: "8600710244",
         password: bcryptPassword("1234"),
-
       });
     } else {
       console.log("admin already exist");

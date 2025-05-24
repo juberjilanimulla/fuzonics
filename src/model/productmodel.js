@@ -4,7 +4,10 @@ const productSchema = new Schema(
   {
     name: String,
     description: String,
-    qty: String,
+    qty: {
+      type: Number,
+      min: 0,
+    },
     productcode: String,
     color: String,
     images: [{ type: String }],
@@ -33,6 +36,10 @@ const productSchema = new Schema(
     sku: {
       type: String,
       unique: true,
+    },
+    price: {
+      type: Number,
+      required: true,
     },
     isActive: { type: Boolean, default: true },
     isFeatured: { type: Boolean, default: false },
