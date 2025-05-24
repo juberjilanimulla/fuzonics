@@ -11,6 +11,7 @@ import {
   isAdminMiddleware,
 } from "./helpers/helperFunction.js";
 import adminRouter from "./routes/admin/adminRouter.js";
+import userRouter from "./routes/user/userRouter.js";
 
 const app = express();
 const port = config.PORT;
@@ -53,7 +54,7 @@ app.use((err, req, res, next) => {
 //routting
 app.use("/api/auth", authRouter);
 app.use("/api/admin", authMiddleware, isAdminMiddleware, adminRouter);
-
+app.use("/api/user", userRouter);
 //database connection
 dbConnect()
   .then(() => {

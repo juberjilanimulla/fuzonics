@@ -11,9 +11,9 @@ const admincategoryRouter = Router();
 export default admincategoryRouter;
 
 admincategoryRouter.post("/create", createcategoryHandler);
-admincategoryRouter.post("/:categoryid/create", createsubcategoryHandler);
+admincategoryRouter.put("/update/:id", updatecategoryHandler);
+admincategoryRouter.delete("/delete/:id", deletecategoryHandler);
 admincategoryRouter.get("/getcategory", getcategoryHandler);
-admincategoryRouter.get("/:id/getsubcategory", getsubcategoryHandler);
 admincategoryRouter.get("/", getallcategorywithsubcategoryHandler);
 
 async function createcategoryHandler(req, res) {
@@ -37,61 +37,10 @@ async function createcategoryHandler(req, res) {
   }
 }
 
-async function createsubcategoryHandler(req, res) {
-  try {
-    const { name, description } = req.body;
-    if (!name || !description) {
-      return errorResponse(res, 400, "some params are missing");
-    }
-    const { categoryid } = req.params;
-    const category = await categorymodel.findById(categoryid);
-    if (!category) {
-      return errorResponse(res, 404, "category not found");
-    }
-    const existingSubCategory = await subcategorymodel.findOne({
-      name,
-      category: categoryid,
-    });
-    if (existingSubCategory) {
-      return errorResponse(
-        res,
-        400,
-        "Subcategory already exists in this category"
-      );
-    }
-    const subcategory = await subcategorymodel.create({
-      name,
-      description,
-      category: categoryid,
-    });
-    successResponse(res, "success", subcategory);
-  } catch (error) {
-    console.log("error", error);
-    errorResponse(res, 500, "internal server error");
-  }
-}
-
 async function getcategoryHandler(req, res) {
   try {
     const category = await categorymodel.find({ isActive: true });
     successResponse(res, "success", category);
-  } catch (error) {
-    console.log("error", error);
-    errorResponse(res, 500, "internal server error");
-  }
-}
-
-async function getsubcategoryHandler(req, res) {
-  try {
-    const category = await categorymodel.findById(req.params.id);
-    if (!category) {
-      return errorResponse(res, 404, "category not found");
-    }
-    const subcategory = await subcategorymodel.find({
-      category: req.params.id,
-      isActive: true,
-    });
-    successResponse(res, "success", { category, subcategory });
   } catch (error) {
     console.log("error", error);
     errorResponse(res, 500, "internal server error");
@@ -121,6 +70,45 @@ async function getallcategorywithsubcategoryHandler(req, res) {
 
 async function updatecategoryHandler(req, res) {
   try {
+    const { id } = req.params;
+    const { name, description } = req.body;
+
+    const category = await categorymodel.findById(id);
+    if (!category) {
+      return errorResponse(res, 404, "Category not found");
+    }
+
+    // Check if the new name already exists in another category
+    const existingCategory = await categorymodel.findOne({
+      name,
+      _id: { $ne: id },
+    });
+    if (existingCategory) {
+      return errorResponse(res, 409, "Category name already in use");
+    }
+
+    category.name = name;
+    category.description = description;
+    await category.save();
+
+    successResponse(res, "Category updated successfully", category);
+  } catch (error) {
+    console.log("error", error);
+    errorResponse(res, 500, "internal server error");
+  }
+}
+
+async function deletecategoryHandler(req, res) {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return errorResponse(res, 400, "Category ID is missing");
+    }
+    const category = await categorymodel.findByIdAndDelete(id);
+    if (!category) {
+      return errorResponse(res, 404, "Category not found");
+    }
+    successResponse(res, "Category deleted successfully");
   } catch (error) {
     console.log("error", error);
     errorResponse(res, 500, "internal server error");
