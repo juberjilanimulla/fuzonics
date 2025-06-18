@@ -60,6 +60,51 @@ async function createsubcategoryHandler(req, res) {
 
 async function updatesubcategoryHandler(req, res) {
   try {
+    const { id } = req.params;
+    const { name, description, categoryid } = req.body;
+
+    if (!id) {
+      return errorResponse(res, 400, "Subcategory ID is missing");
+    }
+
+    const subcategory = await subcategorymodel.findById(id);
+    if (!subcategory) {
+      return errorResponse(res, 404, "Subcategory not found");
+    }
+
+    // If category is changing, validate it
+    if (categoryid) {
+      const category = await categorymodel.findById(categoryid);
+      if (!category) {
+        return errorResponse(res, 404, "New category not found");
+      }
+      subcategory.category = categoryid;
+    }
+
+    // If name is being updated, check for duplicates within the (possibly updated) category
+    if (name && name !== subcategory.name) {
+      const existing = await subcategorymodel.findOne({
+        name,
+        category: categoryid || subcategory.category,
+        _id: { $ne: id },
+      });
+      if (existing) {
+        return errorResponse(
+          res,
+          409,
+          "Subcategory with this name already exists in the category"
+        );
+      }
+      subcategory.name = name;
+    }
+
+    if (description) {
+      subcategory.description = description;
+    }
+
+    await subcategory.save();
+
+    successResponse(res, "Subcategory updated successfully", subcategory);
   } catch (error) {
     console.log("error", error);
     errorResponse(res, 500, "internal server error");
@@ -68,6 +113,15 @@ async function updatesubcategoryHandler(req, res) {
 
 async function deletesubcategoryHandler(req, res) {
   try {
+    const { id } = req.params;
+    if (!id) {
+      return errorResponse(res, 400, "some params are missing");
+    }
+    const subcategory = await subcategorymodel.findByIdAndDelete(id);
+    if (!subcategory) {
+      return errorResponse(res, 404, "invalid subcategoryid");
+    }
+    successResponse(res, "successfully deleted");
   } catch (error) {
     console.log("error", error);
     errorResponse(res, 500, "internal server error");
